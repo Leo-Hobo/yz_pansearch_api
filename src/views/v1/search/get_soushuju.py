@@ -13,7 +13,7 @@ from src.logic.cache_tools import get_cache, set_cache
 from src.utils import md5_encryption
 
 
-@token_required()
+# @token_required()
 def get_soushuju():
     """
     测试接口
@@ -44,11 +44,20 @@ def get_soushuju():
             
             if spider_data:
                 for res in spider_data:
-                    target_data.append({
-                        "title": res.get("title", kw) or kw,
-                        "url": res.get("url", ""),
-                        "code": res.get("code", ""),
-                    })
+                    res_dict = {}
+                    url = res.get("url", "")
+                    code = res.get("code", "")
+                    if "baidu" or "quark" in url:
+                        domain = url.split(".")[1]
+                        res_dict.setdefault(domain, []).append({"url": url, "code": code})
+                    else:
+                        res_dict.setdefault("other", []).append({"url": url, "code": code})
+                    if res_dict:
+                        target_data.append({
+                            "title": res.get("title", ""),
+                            "description": res.get("description", ""),
+                            "res_dict": res_dict
+                        })
             else:
                 # 数据抓取失败
                 app_logger.error(f"数据抓取失败( soushuju 源，请考虑使用代理)，kw: {kw}")

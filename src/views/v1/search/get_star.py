@@ -5,24 +5,15 @@ Changelog: all notable changes to this file will be documented
 """
 
 from flask import current_app, request
-import os
-import sys
-
-# 将项目根目录添加到Python路径中
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.abspath(os.path.join(current_dir, "../../"))
-sys.path.append(project_root)
 
 from src.collector import star_spider
 from src.common import ResponseField, UniResponse, response_handle, token_required
 from src.config import LOGGER, Config
 from src.logic.cache_tools import get_cache, set_cache
-from src.logic.pan_baidu_tools import get_baidu_url_by_txt
-from src.logic.pan_quark_tools import get_quark_url_by_txt, get_share_url_token
 from src.utils import md5_encryption
 
 
-# @token_required()
+@token_required()
 def get_star():
     """
     测试接口
@@ -33,10 +24,6 @@ def get_star():
     proxy_model = request.headers.get("PROXY-MODEL", 0)
     # 默认开启缓存
     is_cache = request.headers.get("IS-CACHE", "1")
-    # 默认提取夸克链接
-    pan_type = request.headers.get("PAN-TYPE", "quark")
-    check_pan_url = request.headers.get("CHECK-PAN-URL", "0")
-    pan_type_list = pan_type.lower().strip().split(";")
 
     # 获取基础数据
     post_data: dict = request.json
@@ -45,7 +32,7 @@ def get_star():
     if kw:
         # 是否从缓存获取数据
         md5_key = md5_encryption(f"{kw}_{proxy_model}")
-        cache_key = f"yz_star:star:{md5_key}"
+        cache_key = f"yz_pansearch:star:{md5_key}"
         redis_data = None
         if is_cache == "1":
             redis_data = get_cache(cache_key)
