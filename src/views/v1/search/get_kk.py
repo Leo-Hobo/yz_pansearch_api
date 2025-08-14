@@ -27,6 +27,8 @@ def get_kk():
     # 默认开启缓存
     is_cache = request.headers.get("IS-CACHE", "1")
     # 默认提取夸克链接
+
+    host_url = request.headers.get("HOST-URL", "")
     pan_type = request.headers.get("PAN-TYPE", "quark")
     check_pan_url = request.headers.get("CHECK-PAN-URL", "0")
     pan_type_list = pan_type.lower().strip().split(";")
@@ -45,7 +47,7 @@ def get_kk():
         if redis_data:
             result = redis_data
         else:
-            spider_data = kk_spider.start(kw, proxy_model)
+            spider_data = kk_spider.start(kw, host_url, proxy_model)
             target_data = []
             if spider_data:
                 for _, res_list in spider_data.items():

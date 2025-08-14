@@ -102,13 +102,15 @@ def get_kk_data(kw: str, kk_url, kk_channel: str, proxy_model: int = 0) -> dict:
     return result
 
 
-def start(kw: str, proxy_model: int = 0) -> dict:
+def start(kw: str, host_url: str = "", proxy_model: int = 0) -> dict:
     """
     启动 KK 爬虫
     """
     # 抓取 kk_channel 为 kk 和 xy 的数据
     result = {}
     kk_url_list = Config.SOURCE_CONFIG["kk"]
+    if host_url:
+        kk_url_list = [host_url]
     # kk_url_list = ["http://m.kkqws.com"]
     # 对 kk_url_list 随机打乱
     random.shuffle(kk_url_list)
