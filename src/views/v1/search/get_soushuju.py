@@ -13,7 +13,7 @@ from src.logic.cache_tools import get_cache, set_cache
 from src.utils import md5_encryption
 
 
-# @token_required()
+@token_required()
 def get_soushuju():
     """
     测试接口
