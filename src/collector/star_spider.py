@@ -26,16 +26,13 @@ def parse_page_data(html_content):
     """使用 lxml 解析网页内容并提取所需数据"""
     tree = html.fromstring(html_content)
     title = tree.xpath('.//h1')
-    # print(html_content)
     if not title:
         return None
     title = title[0].text.strip()
     urls = tree.xpath('.//a[@class="dlipp-dl-btn j-wbdlbtn-dlipp"]/@href')
-    data = {
-        "title": title,
-        "description": "",
-        "url": urls
-    }
+    url = " ".join(urls) if urls else ""
+    data = {"title": title, "description": "", "url": url}
+
     return data
 
 
@@ -50,7 +47,7 @@ def get_total_url(req_url, headers, proxy, html_content):
         page_url = f"{req_url}&page={pa}"
         page_content = fetch_page_data(page_url, headers, proxy)
         if isinstance(page_content, dict) and "err_msg" in page_content:
-            print(f"请求失败: {page_content["err_msg"]}")
+            LOGGER.error(f"请求失败: {page_content['err_msg']}")
             continue
         tree = html.fromstring(page_content)
         items = tree.xpath('.//ul[@class="erx-list"]/li//div[@class="a"]/a/@href')
@@ -84,7 +81,7 @@ def run_spider(kw: str, proxy_model: int = 0):
 
     html_content = fetch_page_data(req_url, headers, proxy)
     if isinstance(html_content, dict) and "err_msg" in html_content:
-        print(f"请求失败: {html_content['err_msg']}")
+        LOGGER.error(f"请求失败: {html_content['err_msg']}")
         return None
 
     all_data = []
@@ -92,7 +89,7 @@ def run_spider(kw: str, proxy_model: int = 0):
     for url in total_url:
         page_content = fetch_page_data(url, headers, proxy)
         if isinstance(page_content, dict) and "err_msg" in page_content:
-            print(f"请求失败: {page_content["err_msg"]}")
+            LOGGER.error(f"请求失败: {page_content['err_msg']}")
             continue
         page_data = parse_page_data(page_content)
         all_data.append(page_data)
